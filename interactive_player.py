@@ -1,6 +1,5 @@
 from abstract_player import AbstractPlayer
-import random
-
+from UI.ui import UIdisplay
 
 class InteractivePlayer(AbstractPlayer):
     def __init__(self, color):
@@ -13,13 +12,12 @@ class InteractivePlayer(AbstractPlayer):
 
 
     def present_possible_moves(self, possible_moves):
-        pass
+        # TODO UI
+        UIdisplay.present_possible_moves(possible_moves)
+
 
 
     def get_choise(self):
-        while True:
-            try:
-                move = (int(x) for x in input("what is your").split(", "))
-                return move
-            except Exception:
-                print("try again")
+        # TODO UI
+        return UIdisplay.get_choise()
+

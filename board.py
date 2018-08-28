@@ -10,6 +10,7 @@ class Board:
             self.size = (size, size)
         else:
             self.size = (size, ysize)
+        self.square_matrix = [[]*self.size[1]]*self.size[0]
         for x in self.size[0]:
             for y in self.size[1]:
                 self.square_matrix[x][y] = Square(x, y)
@@ -22,11 +23,12 @@ class Board:
 
     def flip_disk (self, move, rule, player):
         '''save changed disks and return the move disk'''
+        '''flipping_rule'''
         ''':exception your problem'''
         self.square_matrix[move[0]][move[1]].flip_disk(rule, player)
+        self.update_search_pool()
 
-
-    def update_search_pool(self, rule):
+    def update_search_pool(self):
         '''look at changed field of the disks and update accordingly'''
         disk: Square
         for disk in Square.changed_disks:
@@ -48,3 +50,10 @@ class Board:
 
     def get_search_pool(self):
         return self.search_pool
+
+
+    def display_board(self):
+        #TODO UI
+        # useless
+        pass
+

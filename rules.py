@@ -1,12 +1,11 @@
 from disk import Disk
-"""thinkkkkkkkkkkkkkkkkkkkkkkkk"""
 
 class Rules:
     '''the class for the game rules'''
 
     def __init__(self):
-        self.winning_rules = self.default_winning_rule
-        self.flipping_rules = self.default_flipping_rules
+        self.winning_rule = self.default_winning_rule
+        self.flipping_rule = self.default_flipping_rules
         self.starting_pattern = self.default_create_starting_pattern
         self.possible_moves_rule = self.default_possible_moves_rule
 
@@ -82,5 +81,5 @@ class Rules:
                 if player.color == Disk.DARK:
                     if connection[1] == square.light_dark:
                         possible_squares.append(square)
-
+        return possible_squares
 
