@@ -52,34 +52,37 @@ class Rules:
     def default_flipping_rules(self, square, color):
         if square.color == color:
             return
-        for connection in square.neighbours:
+        for connection in square.get_neighbours():
+            if square.get_neighbours()[connection] is None:
+                continue
             if color is Disk.DARK:
-                if connection[1] == square.light_dark:
+                if square.get_neighbours()[connection][1] == square.light_dark:
                     square.concatenate_flip(color, connection, square.DARK)
             elif color is Disk.LIGHT:
-                if connection[1] == square.dark_light:
+                if square.get_neighbours()[connection][1] == square.dark_light:
                     square.concatenate_flip(color, connection)
 
-        square.change_color()
+        square.change_color(color)
 
-    def default_create_starting_pattern(self, board):
-        x1, x2 = board.size[0]//2, board.size[0]//2 + 1
-        y1, y2 = board.size[1] // 2, board.size[1] // 2 + 1
-        board.get_square_matrix()[x1][y2].change_color(Disk.DARK)
-        board.get_square_matrix()[x2][y1].change_color(Disk.DARK)
-        board.get_square_matrix()[x1][y1].change_color(Disk.LIGHT)
-        board.get_square_matrix()[x2][y2].change_color(Disk.LIGHT)
+    def default_create_starting_pattern(self, board,player_light, player_dark):
+        x1, x2 = board.size[0]//2, board.size[0]//2 - 1
+        y1, y2 = board.size[1] // 2, board.size[1] // 2 - 1
+        board.flip_disk([x1, y2], self.flipping_rule, player_dark)
+        board.flip_disk([x2, y1], self.flipping_rule, player_dark)
+        board.flip_disk([x1, y1], self.flipping_rule, player_light)
+        board.flip_disk([x2, y2], self.flipping_rule, player_light)
 
 
     def default_possible_moves_rule(self, player, board):
         possible_squares = []
         for square in board.get_search_pool():
-            for connection in square.neighbours:
+            for connection in square.get_neighbours():
+                print(square.get_neighbours()[connection])
                 if player.color == Disk.LIGHT:
-                    if connection[1] == square.dark_light:
+                    if square.get_neighbours()[connection][1] == square.dark_light:
                         possible_squares.append(square)
                 if player.color == Disk.DARK:
-                    if connection[1] == square.light_dark:
+                    if square.get_neighbours()[connection][1] == square.light_dark:
                         possible_squares.append(square)
         return possible_squares
 

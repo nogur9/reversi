@@ -40,7 +40,7 @@ class Game:
                 self.check_winner()
                 break
             if self.moves_left[player.color]:
-                self.play_turn()
+                self.play_turn(player)
 
 
     @classmethod
@@ -56,7 +56,7 @@ class Game:
     @classmethod
     def default_start(cls):
         num_of_human_players = 2
-        cls(num_of_human_players=num_of_human_players, board_size=4)
+        return cls(num_of_human_players=num_of_human_players, board_size=4)
 
     def get_rules(self):
         '''init the rules for the game'''
@@ -84,19 +84,20 @@ class Game:
 
     def init_board(self, board_size, board_y_axis_size = 0):
         self.board = Board(board_size, ysize=board_y_axis_size)
+        self.rules.starting_pattern(self.board, self.players[0], self.players[1])
 
     def init_ui(self):
         self.ui = UIdisplay()
 
     def play_turn(self, player):
-        new_turn = Turn(player, self.board, self.rules)
+        new_turn = Turn(player, self.board, self.rules, self.ui)
         result = new_turn.play_turn()
         self.moves_left[player.color] = result
 
 
     def check_winner(self):
-        winner = self.rules.winning_rule()
-        UIdisplay.display_winning(winner)
+        winner = self.rules.winning_rule(self.board, *(self.players))
+        self.ui.display_winning(winner)
 
     def turns_iter(self):
         while True:

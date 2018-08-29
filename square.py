@@ -1,6 +1,6 @@
 from disk import Disk
 
-class Square(Disk):
+class Square():
     '''repr the location on the board'''
 
     """
@@ -16,25 +16,36 @@ class Square(Disk):
     NONE = 0 - no one around
     """
     changed_disks = []
+    NONE = 0
+    DARK = 1
+    LIGHT = 2
     both = 3
     dark_light = 4
     light_dark = 5
 
     def __init__(self, x, y):
         self.color = self.NONE
-        self.up = None
-        self.left = None
-        self.right = None
-        self.down = None
-        self.diagonal_lu = None
-        self.diagonal_ld = None
-        self.diagonal_ru = None
-        self.diagonal_rd = None
-        self.neighbours = [self.up, self.left, self.right, self.down, self.diagonal_lu,
-                           self.diagonal_ld, self.diagonal_ru, self.diagonal_rd]
+        self.up = [None, self.NONE]
+        self.left = [None, self.NONE]
+        self.right = [None, self.NONE]
+        self.down = [None, self.NONE]
+        self.diagonal_lu = [None, self.NONE]
+        self.diagonal_ld = [None, self.NONE]
+        self.diagonal_ru = [None, self.NONE]
+        self.diagonal_rd = [None, self.NONE]
+
         self.x = x
         self.y = y
 
+    def get_neighbours(self):
+        return {0: self.up, 1: self.left, 2: self.right, 3: self.down, 4: self.diagonal_lu,
+                           5: self.diagonal_ld, 6: self.diagonal_ru, 7: self.diagonal_rd}
+    def get_reverse(self,connection):
+        reverse ={0:3,1:2, 2:1, 3:0, 4:7, 5:6,6:5,7:4}
+        it = self.get_neighbours()[connection][0].get_neighbours()[reverse[connection]]
+        return it
+    def get_disk_connection(self, connection):
+        return self.get_neighbours()[connection]
     def flip_disk(self, flipping_rule, player):
         flipping_rule(self, player.color)
 
@@ -42,79 +53,46 @@ class Square(Disk):
     def change_color(self, new_color):
         self.changed_disks.append(self)
         self.color = new_color
-        self.update_connection(self.get_diagonal_ld)
-        self.update_connection(self.get_diagonal_lu)
-        self.update_connection(self.get_diagonal_rd)
-        self.update_connection(self.get_diagonal_ru)
-        self.update_connection(self.get_up)
-        self.update_connection(self.get_down)
-        self.update_connection(self.get_left)
-        self.update_connection(self.get_right)
-
+        for i in self.get_neighbours():
+            self.update_connection(i)
 
     def empty_changed_field(self):
         self.changed_disks = []
 
 
     def concatenate_flip(self, color, connection, changing_color):
-        tmp = connection(self)[0]
+        if self.get_neighbours()[connection] is None:
+            return
+        tmp = self.get_neighbours()[connection][0]
         while tmp.color == changing_color:
             tmp.change_color(color)
-            tmp = connection(tmp)[0]
+            tmp = self.get_neighbours()[connection][0]
 
 
 
-    def update_connection(self, connection):
-        if self.color is Disk.LIGHT:
-            if connection(self)[1] is self.DARK:
-                # if full dark, and light- update neighbour to light and all the others toward dark_light
-                connection(self)[1] = self.LIGHT
-                self.changed_disks.append(connection(self)[0])
-                tmp = connection(self)[0]
-                while connection(tmp)[1] is self.DARK:
-                    connection(tmp)[1] = self.dark_light
-                    self.changed_disks.append(tmp)
-                    tmp = connection(tmp)[0]
+    def update_connection(self, connection, concat_color = None):
+        reverse = {0: 3, 1: 2, 2: 1, 3: 0, 4: 7, 5: 6, 6: 5, 7: 4}
+        if self.get_neighbours()[connection][0] is None:
+            return
+        if self.get_disk_connection(connection)[0] is None:
+            return
 
-            elif connection(self)[1] is self.LIGHT:
-                # if full light, and light-dont update
-                pass
-            elif connection(self)[1] is self.NONE:
-                connection(self)[1] = self.LIGHT
-                self.changed_disks.append(connection(self)[0])
-                tmp = connection(self)[0]
-                while connection(tmp)[1] is self.DARK:
-                    connection(tmp)[1] = self.dark_light
-                    self.changed_disks.append(tmp)
-                    tmp = connection(tmp)[0]
-            elif connection(self)[1] is self.dark_light:
-                self.changed_disks.append(connection(self)[0])
-                connection(self)[1] = self.LIGHT
-        if self.color is Disk.DARK:
-            if self.connection()[1] is self.LIGHT:
-                # if full light, and dark-
-                self.connection()[1] = self.DARK
-                self.changed_disks.append(connection(self)[0])
-                tmp = self.connection()[0]
-                while tmp.connection()[1] is self.LIGHT:
-                    tmp.connection()[1] = self.light_dark
-                    self.changed_disks.append(tmp)
-                    tmp = tmp.connection()[0]
-            elif self.connection()[1] is self.DARK:
-                # if full light, and light-dont update
-                pass
-            elif self.connection()[1] is self.NONE:
-                self.connection()[1] = self.DARK
-                self.changed_disks.append(connection(self)[0])
-                tmp = self.connection()[0]
-                while tmp.connection()[1] is self.LIGHT:
-                    tmp.connection()[1] = self.light_dark
-                    self.changed_disks.append(tmp)
-                    tmp = tmp.connection()[0]
-            elif self.connection()[1] is self.light_dark:
-                self.changed_disks.append(connection(self)[0])
-                self.connection()[1] = self.DARK
-
+        self.changed_disks.append(self.get_disk_connection(connection)[0])
+        if self.color is Square.LIGHT or concat_color is Square.LIGHT:
+            # if he look at me and see dark
+            if self.get_reverse(connection)[1] is self.DARK:
+                self.get_disk_connection(connection)[0].get_reverse(connection)[1] = self.light_dark
+                concat = self.get_disk_connection(connection)[0]
+                concat.update_connection(connection, concat_color=self.LIGHT)
+            else:
+                self.get_disk_connection(connection)[0].get_neighbours()[reverse[connection]][1] = self.LIGHT
+        else:
+            if self.get_reverse(connection)[1] is self.LIGHT:
+                self.get_disk_connection(connection)[0].get_reverse(connection)[1] = self.dark_light
+                concat = self.get_disk_connection(connection)[0]
+                concat.update_connection(connection, concat_color=self.DARK)
+            else:
+                self.get_disk_connection(connection)[0].get_neighbours()[reverse[connection]][1] = self.DARK
 
     def get_up(self):
         return self.up
