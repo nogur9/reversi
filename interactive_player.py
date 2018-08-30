@@ -6,18 +6,19 @@ class InteractivePlayer(AbstractPlayer):
         super().__init__(color)
 
     def get_move(self, board, possible_moves):
-        self.present_possible_moves(possible_moves)
-        move = self.get_choise()
+        ui = UIdisplay()
+        self.present_possible_moves(possible_moves, ui)
+        move = self.get_choise(ui)
         return move
 
 
-    def present_possible_moves(self, possible_moves):
+    def present_possible_moves(self, possible_moves,ui):
         # TODO UI
-        UIdisplay.present_possible_moves(possible_moves)
+        ui.present_possible_moves(possible_moves)
 
 
 
-    def get_choise(self):
+    def get_choise(self,ui):
         # TODO UI
-        return UIdisplay.get_choise()
+        return ui.get_choise()
 

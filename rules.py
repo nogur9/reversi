@@ -38,15 +38,27 @@ class Rules:
 
 
     def default_winning_rule(self, board, *players):
-        count_dict = {player.color: 0 for player in players}
+        cnt_dark = 0
+        cnt_light = 0
         for x in board.get_square_matrix():
-            for square in x:
-                if square.color:
-                    count_dict[square.color] += 1
-        winning_color = max(count_dict, key=count_dict.get)
+            for s in x:
+                if s == Disk.DARK:
+                    cnt_dark += 1
+                elif s == Disk.LIGHT:
+                    cnt_light += 1
         for player in players:
-            if player.color == winning_color:
-                return player
+            if player.color == Disk.DARK:
+                dark_player = player
+        if (cnt_dark - cnt_light) > 0:
+            dark_player.set_reward(1)
+            return Disk.DARK
+        elif (cnt_dark - cnt_light) < 0:
+            dark_player.set_reward(-1)
+            return Disk.LIGHT
+        else:
+            dark_player.set_reward(0)
+            return Disk.NONE
+
 
 
     def default_flipping_rules(self, square, color):
@@ -64,13 +76,11 @@ class Rules:
 
         square.change_color(color)
 
-    def default_create_starting_pattern(self, board,player_light, player_dark):
+    def default_create_starting_pattern(self, board):
         x1, x2 = board.size[0]//2, board.size[0]//2 - 1
         y1, y2 = board.size[1] // 2, board.size[1] // 2 - 1
-        board.flip_disk([x1, y2], self.flipping_rule, player_dark)
-        board.flip_disk([x2, y1], self.flipping_rule, player_dark)
-        board.flip_disk([x1, y1], self.flipping_rule, player_light)
-        board.flip_disk([x2, y2], self.flipping_rule, player_light)
+        start = ([[x1, y2],Disk.DARK], [[x2, y1],Disk.DARK],[[x1, y1],Disk.LIGHT],[[x2, y2],Disk.LIGHT])
+        board.init_starting_pattern(start)
 
 
     def default_possible_moves_rule(self, player, board):

@@ -2,6 +2,7 @@ from rules import Rules
 from random_player import RandomPlayer
 from interactive_player import InteractivePlayer
 from computer_player import ComputerPlayer
+from simple_player import SimplePlayer
 from disk import Disk
 from board import Board
 from UI.ui import UIdisplay
@@ -11,8 +12,8 @@ from turn import Turn
 class Game:
     '''the overall reversi game class'''
     human_player_class = InteractivePlayer
-    computer_player1_class = RandomPlayer
-    computer_player2_class = RandomPlayer
+    computer_player1_class = SimplePlayer
+    computer_player2_class = SimplePlayer
 
 
     def __init__(self, num_of_human_players = 0 , board_size=8, board_y_axis_size=0):
@@ -26,20 +27,21 @@ class Game:
         '''the overall control function for playing the game'''
 
         # 0. create counter for the turns
-
         turns_iterator = self.turns_iter()
-
         # 0.5 . handle time
         while True:
             player = next(turns_iterator)
             # stop if - no moves left
+            print(self.moves_left)
             for key in self.moves_left:
                 if self.moves_left[key]:
                     break
             else:
                 self.check_winner()
+                self.update()
                 break
             if self.moves_left[player.color]:
+                self.update()
                 self.play_turn(player)
 
 
@@ -55,7 +57,7 @@ class Game:
 
     @classmethod
     def default_start(cls):
-        num_of_human_players = 2
+        num_of_human_players = 0
         return cls(num_of_human_players=num_of_human_players, board_size=4)
 
     def get_rules(self):
@@ -84,7 +86,7 @@ class Game:
 
     def init_board(self, board_size, board_y_axis_size = 0):
         self.board = Board(board_size, ysize=board_y_axis_size)
-        self.rules.starting_pattern(self.board, self.players[0], self.players[1])
+        self.rules.starting_pattern(self.board)
 
     def init_ui(self):
         self.ui = UIdisplay()
@@ -106,3 +108,9 @@ class Game:
 
     def create_timer(self, player):
         pass
+
+    def update(self):
+        for player in self.players:
+            if player.color == Disk.DARK:
+                dark_player = player
+        dark_player.update_map(self.board)
