@@ -1,24 +1,30 @@
 from abstract_player import AbstractPlayer
 import random
 from copy import deepcopy
-
+max_depth = 3
 from disk import Disk
 
 
-class RandomPlayer(AbstractPlayer):
+class MinimaxPlayer(AbstractPlayer):
     def __init__(self, color):
         super().__init__(color)
 
     def get_move(self, board, possible_moves):
-        return self.minimax(board, possible_moves)
+        move = self.minimax(board, possible_moves, 0)
+        return move
 
 
-    def minimax(self, board, possible_moves):
+    def minimax(self, board, possible_moves, depth):
+        if depth == max_depth:
+            return self.evaluate(board)
+        if len(possible_moves) == 0:
+            return None
         best_move = possible_moves[0]
         best_score = float('-inf')
         for move in possible_moves:
-            abstract_board = deepcopy(board.performe_move(move, self, None))
-            score = self.min_play(abstract_board)
+            abstract_board = deepcopy(board)
+            abstract_board.performe_move(move, self, None)
+            score = self.min_play(abstract_board, depth)
             if score > best_score:
                 best_move = move
                 best_score = score
@@ -32,26 +38,32 @@ class RandomPlayer(AbstractPlayer):
                 else:
                     return 1
 
-    def min_play(self, board):
+    def min_play(self, board, depth):
+        if depth == max_depth:
+            return self.evaluate(board)
         if self.is_gameover(board):
             return self.evaluate(board)
         moves = board.get_possible_moves(self)
         best_score = float('inf')
         for move in moves:
-            abstract_board = deepcopy(board.performe_move(move, self, None))
-            score = self.max_play(abstract_board)
+            abstract_board = deepcopy(board)
+            abstract_board.performe_move(move, self, None)
+            score = self.max_play(abstract_board, depth+1)
             if score < best_score:
                 best_score = score
         return best_score
 
-    def max_play(self, board):
+    def max_play(self, board, depth):
+        if depth == max_depth:
+            return self.evaluate(board)
         if self.is_gameover(board):
             return self.evaluate(board)
         moves = board.get_possible_moves(self)
         best_score = float('-inf')
         for move in moves:
-            abstract_board = deepcopy(board.performe_move(move, self, None))
-            score = self.min_play(abstract_board)
+            abstract_board = deepcopy(board)
+            abstract_board.performe_move(move, self, None)
+            score = self.min_play(abstract_board, depth+1)
             if score > best_score:
                 best_score = score
         return best_score
@@ -69,3 +81,11 @@ class RandomPlayer(AbstractPlayer):
             return 1 if (cnt_dark - cnt_light) > 0 else -1
         else:
             return -1 if (cnt_dark - cnt_light) > 0 else 1
+
+
+    def set_reward(self, o):
+        pass
+
+
+    def update_map(self, c):
+        pass

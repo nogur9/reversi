@@ -1,7 +1,10 @@
 from rules import Rules
 from random_player import RandomPlayer
 from interactive_player import InteractivePlayer
-from computer_player import ComputerPlayer
+from minimax_player.min_max_player import MinimaxPlayer
+from minimax_player.min_max_player_2 import MinimaxPlayer2
+from minimax_player.min_max_player_3 import MinimaxPlayer3
+from qplayer.q_player import QPlayer
 from simple_player import SimplePlayer
 from disk import Disk
 from board import Board
@@ -12,8 +15,8 @@ from turn import Turn
 class Game:
     '''the overall reversi game class'''
     human_player_class = InteractivePlayer
-    computer_player1_class = SimplePlayer
-    computer_player2_class = SimplePlayer
+    computer_player1_class = MinimaxPlayer2
+    computer_player2_class = RandomPlayer
 
 
     def __init__(self, num_of_human_players = 0 , board_size=8, board_y_axis_size=0):
@@ -32,18 +35,17 @@ class Game:
         while True:
             player = next(turns_iterator)
             # stop if - no moves left
-            print(self.moves_left)
             for key in self.moves_left:
                 if self.moves_left[key]:
                     break
             else:
-                self.check_winner()
+                winner = self.check_winner()
                 self.update()
                 break
             if self.moves_left[player.color]:
-                self.update()
                 self.play_turn(player)
-
+                self.update()
+        return winner
 
     @classmethod
     def start_from_config_file(cls):
@@ -58,7 +60,7 @@ class Game:
     @classmethod
     def default_start(cls):
         num_of_human_players = 0
-        return cls(num_of_human_players=num_of_human_players, board_size=4)
+        return cls(num_of_human_players=num_of_human_players, board_size=8)
 
     def get_rules(self):
         '''init the rules for the game'''
@@ -100,6 +102,7 @@ class Game:
     def check_winner(self):
         winner = self.rules.winning_rule(self.board, *(self.players))
         self.ui.display_winning(winner)
+        return winner
 
     def turns_iter(self):
         while True:

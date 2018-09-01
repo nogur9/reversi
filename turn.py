@@ -14,18 +14,20 @@ class Turn:
         '''the overall function'''
 
         #self.ui.clear()
-        self.ui.display_board(self.board)
+        #self.ui.display_board(self.board)
         # display moves to the player
         possible_moves = self.board.get_possible_moves(self.player)
-        print(possible_moves)
+        #print("possible_moves", possible_moves)
+
         if len(possible_moves) > 0:
             # get his move of choise
             while True:
                 try:
                     move = self.player.get_move(self.board, possible_moves)
+                    #print("player", self.player, "move", move)
                     # get apdate to the board
                     self.board.performe_move(move, self.player, self.rules.flipping_rule)
-                    self.ui.flip_disks()
+                    #self.ui.flip_disks()
                     return 1
                 except Exception as exc:
                     print("bad move, enter again", exc)

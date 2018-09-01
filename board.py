@@ -61,7 +61,7 @@ class Board:
 
                         while 0 <= tempX < self.size[0] and 0 <= tempY < self.size[1]:
                             # If an empty space, no line is formed
-                            if self.square_matrix[tempX][tempY] == None:
+                            if self.square_matrix[tempX][tempY] == None or self.square_matrix[tempX][tempY] == Disk.NONE:
                                 break
                             # If it reaches a piece of the player's colour, it forms a line
                             if self.square_matrix[tempX][tempY] == player.color:
@@ -118,7 +118,7 @@ class Board:
                     path.append([tempX, tempY])
                     value = array[tempX][tempY]
                     # If we reach a blank tile, we're done and there's no line
-                    if value == None:
+                    if value == None or value == Disk.NONE:
                         break
                     # If we reach a tile of the player's colour, a line is formed
                     if value == colour:
@@ -142,3 +142,16 @@ class Board:
                 if self.is_valid(player, [i,j]):
                     valid_moves.append([i,j])
         return valid_moves
+
+
+    def score(self):
+        """ returns the current score for the board as a tuple
+            containing # of black pieces, # of white pieces """
+        dark = light = 0
+        for row in self.square_matrix:
+            for square in row:
+                if (square == Disk.DARK):
+                    dark = dark + 1
+                elif (square == Disk.LIGHT):
+                    light = light + 1
+        return (dark, light)
