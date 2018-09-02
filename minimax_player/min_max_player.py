@@ -1,7 +1,7 @@
 from abstract_player import AbstractPlayer
 import random
 from copy import deepcopy
-max_depth = 3
+max_depth = 1
 from disk import Disk
 
 

@@ -1,7 +1,6 @@
 from board import Board
 from disk import Disk
 import itertools
-from hdfs3 import HDFileSystem
 
 import pickle
 import numpy as np
@@ -21,7 +20,7 @@ class QMap:
             with open(path, 'rb') as handle:
                 self.qmap = pickle.load(handle)
 
-            print("\nqmap - init\n",[x for x in self.qmap.items() if x[1] != 0])
+            #print("\nqmap - init\n",[x for x in self.qmap.items() if x[1] != 0])
         else:
             self.qmap = {}
         #product = itertools.product([Disk.NONE, Disk.LIGHT, Disk.DARK], repeat=64)
@@ -82,13 +81,11 @@ class QMap:
         new_state = (my_state, enemy_state)
         options = [[q, key] for key, q in self.qmap.items() if new_state in key]
         poss_moves = []
-        print(options)
         for move in possible_moves:
             if tuple(move) not in [elem[1][1] for elem in options]:
                 self.qmap[(new_state, tuple(move))] = 0
                 poss_moves.append([0, ((my_state, enemy_state), tuple(move))])
             else:
-                poss_moves.append([options[i] for i in range(len(options)) if tuple(move) in options[i][1][1]][0])
-        print(sorted(poss_moves, key=lambda x: x[0], reverse=True))
+                poss_moves.append([options[i] for i in range(len(options)) if tuple(move) in options[i][1]][0])
         chosen = sorted(poss_moves, key=lambda x: x[0], reverse=True)[0][1][1]
         return list(chosen)

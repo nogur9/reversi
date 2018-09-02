@@ -18,8 +18,6 @@ class Turn:
         # display moves to the player
         possible_moves = self.board.get_possible_moves(self.player)
         #print("possible_moves", possible_moves)
-        move = self.player.get_move(self.board, possible_moves)
-        self.board.performe_move(move, self.player, self.rules.flipping_rule)
         if len(possible_moves) > 0:
             # get his move of choise
             while True:

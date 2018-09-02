@@ -15,8 +15,8 @@ from turn import Turn
 class Game:
     '''the overall reversi game class'''
     human_player_class = InteractivePlayer
-    computer_player1_class = MinimaxPlayer2
-    computer_player2_class = QPlayer
+    computer_player1_class = MinimaxPlayer
+    computer_player2_class = RandomPlayer
 
 
     def __init__(self, num_of_human_players = 0 , board_size=8, board_y_axis_size=0):
