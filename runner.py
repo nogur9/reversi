@@ -7,7 +7,7 @@ from qplayer.q_player import QPlayer
 
 d_win = 0
 l_win = 0
-for i in range(100):
+for i in range(50):
     game1 = Game.default_start()
     winner = game1.play_game()
     if winner == Disk.DARK:

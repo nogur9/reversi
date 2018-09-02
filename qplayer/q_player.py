@@ -11,6 +11,8 @@ class QPlayer(AbstractPlayer):
 
     def get_move(self, board, possible_moves):
         move = self.qmap.get_max_q(board, possible_moves)
+        print(possible_moves)
+        print(move)
         self.get_state_action(board, move)
         return move
 

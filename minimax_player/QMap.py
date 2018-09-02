@@ -81,9 +81,14 @@ class QMap:
         my_state, enemy_state = self.from_board_to_states(new_board)
         new_state = (my_state, enemy_state)
         options = [[q, key] for key, q in self.qmap.items() if new_state in key]
+        poss_moves = []
+        print(options)
         for move in possible_moves:
             if tuple(move) not in [elem[1][1] for elem in options]:
                 self.qmap[(new_state, tuple(move))] = 0
-                options.append([0, ((my_state, enemy_state), tuple(move))])
-        chosen = sorted(options, key=lambda x: x[0], reverse=True)[0][1][1]
+                poss_moves.append([0, ((my_state, enemy_state), tuple(move))])
+            else:
+                poss_moves.append([options[i] for i in range(len(options)) if tuple(move) in options[i][1][1]][0])
+        print(sorted(poss_moves, key=lambda x: x[0], reverse=True))
+        chosen = sorted(poss_moves, key=lambda x: x[0], reverse=True)[0][1][1]
         return list(chosen)
