@@ -5,8 +5,8 @@ from hdfs3 import HDFileSystem
 
 import pickle
 import numpy as np
-path = 'qmap_training.pkl'
-path2 = 'qmap_training2.pkl'
+path = 'qmap_training2.pkl'
+path2 = 'qmap_training.pkl'
 
 class QMap:
 
