@@ -3,8 +3,8 @@ import random
 from minimax_player.QMap import QMap
 
 class QPlayer(AbstractPlayer):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, time_per_turn = 5):
+        super().__init__(color, time_per_turn)
         self.reward = 0
         self.last_key = None
         self.qmap = QMap(self)

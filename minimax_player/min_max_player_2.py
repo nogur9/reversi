@@ -4,13 +4,13 @@ from abstract_player import AbstractPlayer
 import random
 from copy import deepcopy
 
-max_depth = 1
+max_depth = 2
 from disk import Disk
 
 
 class MinimaxPlayer2(AbstractPlayer):
-    def __init__(self, color):
-        super().__init__(color)
+    def __init__(self, color, time_per_turn = 5):
+        super().__init__(color, time_per_turn)
         self.weights_matrix = self.weight_matrix()
 
     def get_move(self, board, possible_moves):

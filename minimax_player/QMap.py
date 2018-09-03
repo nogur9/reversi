@@ -11,7 +11,7 @@ class QMap:
 
     def __init__(self, player, load=1):
         self.weights_matrix = self.weight_matrix()
-        self.learning_rate = 0.2
+        self.learning_rate = 0.3
         self.player = player
         self.enemy_color = Disk.LIGHT if player.color == Disk.DARK else Disk.DARK
         self.discount = 1
@@ -56,13 +56,19 @@ class QMap:
 
     def max_q(self, new_board):
         my_state, enemy_state = self.from_board_to_states(new_board)
+        possible_moves = new_board.get_possible_moves(self.player)
         new_state = (my_state, enemy_state)
         options = [[q, key] for key, q in self.qmap.items() if new_state in key]
-        for move in new_board.get_possible_moves(self.player):
+        poss_moves = []
+        for move in possible_moves:
             if tuple(move) not in [elem[1][1] for elem in options]:
                 self.qmap[(new_state, tuple(move))] = 0
-                options.append([0, ((my_state, enemy_state), tuple(move))])
-        val = sorted(options, key=lambda x: x[0], reverse=True)[0][0]
+                poss_moves.append([0, ((my_state, enemy_state), tuple(move))])
+            else:
+                poss_moves.append([options[i] for i in range(len(options)) if tuple(move) in options[i][1]][0])
+        if len(poss_moves) == 0:
+            return 0
+        val = sorted(poss_moves, key=lambda x: x[0], reverse=True)[0][0]
         return val
 
     def save(self, path = path):
