@@ -4,8 +4,8 @@ import itertools
 
 import pickle
 import numpy as np
-path = 'qmap_training2.pkl'
-path2 = 'qmap_training.pkl'
+path = 'qmap_training_index1.pkl'
+path2 = 'qmap_training_index2.pkl'
 
 class QMap:
 
@@ -39,8 +39,8 @@ class QMap:
 
 
     def update(self, action, reward, new_board, board):
-        my_state, enemy_state = self.from_board_to_states(board)
-        key = ((my_state, enemy_state), tuple(action))
+        state = self.evaluate(board)
+        key = (state, tuple(action))
         if key not in self.qmap:
             self.qmap[key] = 0
         self.qmap[key] = (1 - self.learning_rate) * self.qmap[key] + self.learning_rate *\
@@ -55,15 +55,14 @@ class QMap:
         return my_state, enemy_state
 
     def max_q(self, new_board):
-        my_state, enemy_state = self.from_board_to_states(new_board)
+        new_state = self.evaluate(new_board)
         possible_moves = new_board.get_possible_moves(self.player)
-        new_state = (my_state, enemy_state)
         options = [[q, key] for key, q in self.qmap.items() if new_state in key]
         poss_moves = []
         for move in possible_moves:
             if tuple(move) not in [elem[1][1] for elem in options]:
                 self.qmap[(new_state, tuple(move))] = 0
-                poss_moves.append([0, ((my_state, enemy_state), tuple(move))])
+                poss_moves.append([0, (new_state, tuple(move))])
             else:
                 poss_moves.append([options[i] for i in range(len(options)) if tuple(move) in options[i][1]][0])
         if len(poss_moves) == 0:
@@ -93,5 +92,20 @@ class QMap:
                 poss_moves.append([0, ((my_state, enemy_state), tuple(move))])
             else:
                 poss_moves.append([options[i] for i in range(len(options)) if tuple(move) in options[i][1]][0])
-        chosen = sorted(poss_moves, key=lambda x: x[0], reverse=True)[0][1][1]
+        chosen = sorted(poss_moves, key=lambda x: x[0])[0][1][1]
         return list(chosen)
+
+
+    def evaluate(self, board):
+        cnt_dark = 0
+        cnt_light = 0
+        for x in board.get_square_matrix():
+            for s in x:
+                if s == Disk.DARK:
+                    cnt_dark += 1
+                elif s == Disk.LIGHT:
+                    cnt_light += 1
+        if self.player.color == Disk.DARK:
+            return 1 if (cnt_dark - cnt_light) > 0 else -1
+        else:
+            return -1 if (cnt_dark - cnt_light) > 0 else 1
